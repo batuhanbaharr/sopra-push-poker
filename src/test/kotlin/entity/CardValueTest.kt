@@ -4,6 +4,9 @@ import kotlin.test.*
  * test for card value strings and their order
  */
 class CardValueTest {
+    /**
+     * test string format of values
+     */
     @Test
     fun testValueStrings() {
         assertEquals("2", CardValue.TWO.toString())
@@ -11,6 +14,9 @@ class CardValueTest {
         assertEquals("J", CardValue.JACK.toString())
         assertEquals("A", CardValue.ACE.toString())
     }
+    /**
+     * test greater or less logic for values
+     */
     @Test
     fun testValueOrder() {
         assertTrue(CardValue.TWO < CardValue.ACE)

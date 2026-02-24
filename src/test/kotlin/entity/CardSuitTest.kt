@@ -4,6 +4,9 @@ import kotlin.test.*
  * test for card suit strings
  */
 class CardSuitTest {
+    /**
+     * test if suit symbols match
+     */
     @Test
     fun testSuitStrings() {
         assertEquals("♣", CardSuit.CLUBS.toString())
