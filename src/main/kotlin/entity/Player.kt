@@ -1,5 +1,7 @@
 package entity
-
+/**
+ * represent a player in the game
+ */
 data class Player(
     val name: String,
     var actionsLeft: Int = 2,

@@ -1,7 +1,8 @@
 package entity
-
 import kotlin.test.*
-
+/**
+ * test cases for player creation and equals
+ */
 class PlayerTest {
     @Test
     fun testPlayerInitialization() {
