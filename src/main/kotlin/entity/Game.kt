@@ -11,15 +11,14 @@ import tools.aqua.bgw.util.Stack
  * @property currentPlayerIndex the index of the active player
  * @property log text log of game events
  */
-data class Game(
-    val players: MutableList<Player>,
-    val totalRounds: Int
-) {
+data class Game(val players: MutableList<Player> = mutableListOf(), val totalRounds: Int) {
+    //durch mutableListOf() muss ich nicht jedes mal, wenn ich ein game objekt erstelle, eine player liste eingeben
+    //val -> var, weil ich den Fehler " 'val' cannot be reassigned. " bei chooseRounds bekommen habe.
     var currentRound: Int = 1
     val drawStack: Stack<Card> = Stack()
     val discardStack: Stack<Card> = Stack()
     val centerCards: MutableList<Card> = mutableListOf()
     var currentPlayerIndex: Int = 0
     val log: MutableList<String> = mutableListOf()
-
+    //parameter totalRounds var oder val ?
 }

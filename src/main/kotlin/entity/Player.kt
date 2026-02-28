@@ -7,10 +7,8 @@ package entity
  * @property actionsLeft the number of actions the player can still do
  * @property score the value of the player's cards
  */
-data class Player(
-    val name: String
-) {
-    private val hiddenCards: MutableList<Card> = mutableListOf()
+data class Player(val name: String) {
+    val hiddenCards: MutableList<Card> = mutableListOf()
     val openCards: MutableList<Card> = mutableListOf()
     var actionsLeft: Int = 2
     var score: ScoreTable = ScoreTable.HIGHCARD
