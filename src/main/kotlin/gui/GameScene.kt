@@ -49,7 +49,8 @@ class GameScene(private val rootService: RootService):
     /** gold line under top */
     private val topLine = Label(posX = 20, posY = 60, width = 1880, height = 2, visual = ColorVisual(212, 175, 55))
     /** text above center cards */
-    private val centerLabel = Label(posX = 1920 / 2 - 150, posY = 250, width = 300, height = 30, text = "Karten auf dem Tisch",
+    private val centerLabel = Label(posX = 1920 / 2 - 150, posY = 250, width = 300, height = 30,
+        text = "Karten auf dem Tisch",
         font = Font(size = 18, color = Color(160, 160, 140)),
         alignment = Alignment.CENTER)
     /** push left arrow */
@@ -72,7 +73,8 @@ class GameScene(private val rootService: RootService):
         onMouseClicked = { rootService.playerActionService.pushRight() }
     }
     private val drawLabel = Label(posX = 350, posY = 290, width = 190, height = 40, text = "Nachziehstapel",
-        font = Font(size = 18, color = Color(212, 175, 55)), alignment = Alignment.CENTER)
+        font = Font(size = 18, color = Color(212, 175, 55)),
+        alignment = Alignment.CENTER)
     private val drawCard = CardView(posX = 380, posY = 340, width = 130, height = 200, front = cardImageLoader.backImage,
         back = cardImageLoader.backImage)
     private val drawCount = Label(posX = 350, posY = 545, width = 190, height = 30, text = "Karten: 0",
@@ -269,7 +271,7 @@ class GameScene(private val rootService: RootService):
                 alignment = Alignment.CENTER).apply { rotation = rot }
             val layout = LinearLayout<CardView>(posX = lx, posY = ly, width = lw, height = 150, spacing = -25,
                 alignment = Alignment.CENTER).apply { rotation = rot }
-            for (k in 0..4) {
+            repeat(5) {
                 layout.add(CardView(posX = 0, posY = 0, width = 90, height = 135,
                     front = cardImageLoader.backImage, back = cardImageLoader.backImage))
             }

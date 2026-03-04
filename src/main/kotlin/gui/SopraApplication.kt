@@ -16,7 +16,7 @@ class SopraApplication : BoardGameApplication("SoPra Game"), Refreshable {
     /** scene between turns to hide cards */
     private val nextPlayerScene = GameNextPlayerScene(rootService)
     /** scene that show final ranking */
-    private val finishedScene = GameFinishedScene(rootService)
+    private val finishedScene = GameFinishedScene()
     /** set up all scenes and register refreshable */
     init {
         rootService.addRefreshable(this)

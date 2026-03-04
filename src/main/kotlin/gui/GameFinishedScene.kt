@@ -1,6 +1,5 @@
 package gui
 import entity.Player
-import service.RootService
 import service.Refreshable
 import tools.aqua.bgw.components.layoutviews.Pane
 import tools.aqua.bgw.components.uicomponents.Button
@@ -13,8 +12,8 @@ import tools.aqua.bgw.util.Font
 import tools.aqua.bgw.visual.ColorVisual
 /**
  * show final ranking when game end
- * @param rootService for game logic*/
-class GameFinishedScene(private val rootService: RootService) : MenuScene(1920, 1080), Refreshable {
+ */
+class GameFinishedScene() : MenuScene(1920, 1080), Refreshable {
     /** dark box in middle */
     private val contentPane = Pane<UIComponent>(posX = 1920/2-350, posY = 1080/2-370, width = 700,
         height = 740, visual = ColorVisual(15, 45, 20))
