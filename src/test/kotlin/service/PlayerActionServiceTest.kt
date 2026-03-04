@@ -22,8 +22,8 @@ class PlayerActionServiceTest {
     fun setUp() {
         rootService = RootService()
         testRefreshable = TestRefreshable()
-        rootService.gameService.addRefreshable(testRefreshable)
-        rootService.playerActionService.addRefreshable(testRefreshable)
+        rootService.addRefreshable(testRefreshable)
+        rootService.addRefreshable(testRefreshable)
         rootService.gameService.startNewGame(
             mutableListOf("neymar", "reus", "locatelli", "asensio"),
             3
@@ -49,7 +49,7 @@ class PlayerActionServiceTest {
         assertEquals(oldMiddleCard, game.centerCards[0])
         assertEquals(oldRightCard, game.centerCards[1])
         assertEquals(oldDrawStackSize - 1, game.drawStack.size)
-        assertTrue(testRefreshable.refreshAfterPushCalled)
+        assertTrue(testRefreshable.refreshAfterPushLeftCalled)
         val player = game.players[game.currentPlayerIndex]
         assertEquals(1, player.actionsLeft)
     }
@@ -68,7 +68,8 @@ class PlayerActionServiceTest {
      */
     @Test
     fun testPushLeftNoActions() {
-        val game = rootService.currentGame!!
+        val game = rootService.currentGame
+        checkNotNull(game)
         game.players[game.currentPlayerIndex].actionsLeft = 0
         assertThrows<IllegalStateException> {
             rootService.playerActionService.pushLeft()
@@ -110,7 +111,7 @@ class PlayerActionServiceTest {
         assertEquals(oldLeftCard, game.centerCards[1])
         assertEquals(oldMiddleCard, game.centerCards[2])
         assertEquals(oldDrawStackSize - 1, game.drawStack.size)
-        assertTrue(testRefreshable.refreshAfterPushCalled)
+        assertTrue(testRefreshable.refreshAfterPushRightCalled)
         val player = game.players[game.currentPlayerIndex]
         assertEquals(1, player.actionsLeft)
     }
@@ -129,7 +130,8 @@ class PlayerActionServiceTest {
      */
     @Test
     fun testPushRightNoActions() {
-        val game = rootService.currentGame!!
+        val game = rootService.currentGame
+        checkNotNull(game)
         game.players[game.currentPlayerIndex].actionsLeft = 0
         assertThrows<IllegalStateException> {
             rootService.playerActionService.pushRight()
@@ -194,15 +196,33 @@ class PlayerActionServiceTest {
      */
     @Test
     fun testSwitchOneNoActions() {
-        val game = rootService.currentGame!!
+        val game = rootService.currentGame
+        checkNotNull(game)
         game.players[game.currentPlayerIndex].actionsLeft = 0
         assertThrows<IllegalStateException> {
             rootService.playerActionService.switchOne(0, 0)
         }
     }
     /**
-     * testt if swapping all three cards works correctly
+     * test if switchOne throw error when openCardIndex is negative
      */
+    @Test
+    fun testSwitchOneNegativeOpenIndex() {
+        assertThrows<IllegalArgumentException> {
+            rootService.playerActionService.switchOne(-1, 0)
+        }
+    }
+    /**
+     * test if switchOne throw error when centerCardIndex is negative
+     */
+    @Test
+    fun testSwitchOneNegativeCenterIndex() {
+        assertThrows<IllegalArgumentException> {
+            rootService.playerActionService.switchOne(0, -1)
+        }
+    }
+    /**
+     * * testt if swapping all three cards works correctly*/
     @Test
     fun testSwitchAll() {
         val game = rootService.currentGame
@@ -234,7 +254,8 @@ class PlayerActionServiceTest {
      */
     @Test
     fun testSwitchAllNoActions() {
-        val game = rootService.currentGame!!
+        val game = rootService.currentGame
+        checkNotNull(game)
         game.players[game.currentPlayerIndex].actionsLeft = 0
         assertThrows<IllegalStateException> {
             rootService.playerActionService.switchAll()

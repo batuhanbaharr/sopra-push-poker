@@ -20,7 +20,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
      * @throws IllegalArgumentException if player count or round count is wrong or if name is empty
      */
     fun startNewGame(playersNames: MutableList<String>, totalRounds: Int) {
-        check(rootService.currentGame == null) { "es gibt ein spiel am laufen" }
+        check(rootService.currentGame == null) { "es gibt ein spiel " }
         require(playersNames.size in 2..4) { "die anzahl von spieler muss zwischen 2 und 4 sein" }
         require(totalRounds in 2..7) { "die anzahl von rounds muss zwischen 2 und 7 sein" }
         require(playersNames.all { it.isNotBlank() }) { "spielernamen müssen eingegeben werden" }
@@ -42,7 +42,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         repeat(3) { game.centerCards.add(game.drawStack.pop()) }
 
         game.currentPlayerIndex = 0
-        updateLog("Spiel hat begonnen und Startspieler ${players[game.currentPlayerIndex].name}")
+        updateLog("Spiel hat begonnen und Startspieler ${players[0].name}")
         onAllRefreshables { refreshAfterStartNewGame() }
     }
     /**
@@ -50,8 +50,8 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
      * @throws IllegalStateException if there is no game running
      */
     private fun createDrawStack() {
-        checkNotNull(rootService.currentGame) { "es gibt kein spiel am laufen" }
-        val game = rootService.currentGame!!
+        val game = rootService.currentGame
+        checkNotNull(game) { "aktuell läuft kein spiel" }
         for (suit in CardSuit.entries) {
             for (value in CardValue.entries) {
                 val newCard = Card(suit, value)
@@ -66,10 +66,13 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
      * @throws IllegalStateException if there is no game running or both stacks are empty
      */
     fun refillDrawStack() {
-        checkNotNull(rootService.currentGame) { "es gibt kein spiel am laufen" }
-        val game = rootService.currentGame!!
+        val game = rootService.currentGame
+        checkNotNull(game) { "es gibt kein spiel " }
         if (game.drawStack.isEmpty()) {
-            check(game.discardStack.isNotEmpty()) { "sowohl drawStack als auch discardStack sind leer" }
+            if(game.discardStack.isEmpty()){
+                onAllRefreshables { refreshAfterError("draw and discard stack are both empty") }
+                return
+            }
             val newDrawStackCards = game.discardStack.popAll()
             game.drawStack.pushAll(newDrawStackCards)
             game.drawStack.shuffle()
@@ -82,8 +85,8 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
      * @throws IllegalStateException if there is no game running
      * @throws IllegalArgumentException if the player does not have exactly 5 cards
      */
-    fun evaluateCards(player: Player): Int {
-        checkNotNull(rootService.currentGame) { "es gibt kein spiel am laufen" }
+    fun evaluateCards(player: Player){
+        checkNotNull(rootService.currentGame) { "es gibt kein spiel " }
         val cardsInHand = player.openCards + player.hiddenCards
         require(cardsInHand.size == 5) { "in der hand muss es genau 5 karte sein" }
         val values = mutableListOf<Int>()
@@ -121,7 +124,6 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
                 -> ScoreTable.HIGHCARD
         }
         player.score = score
-        return score.ordinal
     }
     /**
      * save message to the log and update the screen
@@ -129,20 +131,19 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
      * @throws IllegalStateException if there is no game running
      */
     fun updateLog(message: String) {
-        checkNotNull(rootService.currentGame) { "es gibt kein spiel am laufen" }
-        val game = rootService.currentGame!!
+        val game = rootService.currentGame
+        checkNotNull(game) { "aktuell läuft kein spiel" }
         game.log.add(message)
         onAllRefreshables { refreshLog(message) }
     }
-
     /**
      * end the game
      * check everyone's points, make a ranking list and stop the game
      * @throws IllegalStateException if there is no game running
      */
     fun endGame() {
-        checkNotNull(rootService.currentGame) { "es gibt kein spiel am laufen" }
-        val game = rootService.currentGame!!
+        val game = rootService.currentGame
+        checkNotNull(game) { "es gibt kein spiel am laufen" }
         for (player in game.players) {
             evaluateCards(player)
         }
@@ -158,8 +159,8 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
      * @throws IllegalStateException if there is no game running
      */
     fun endTurn() {
-        checkNotNull(rootService.currentGame) { "es gibt kein spiel am laufen" }
-        val game = rootService.currentGame!!
+        val game = rootService.currentGame
+        checkNotNull(game) { "es gibt kein spiel " }
         game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.size
         game.players[game.currentPlayerIndex].actionsLeft = 2
         if (game.currentPlayerIndex == 0) {
@@ -171,5 +172,10 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         }
         updateLog("Spieler ${game.players[game.currentPlayerIndex].name} kann jetzt spielen")
         onAllRefreshables { refreshAfterTurnEnd() }
+    }
+    fun startTurn(){
+        val game = rootService.currentGame
+        checkNotNull(game) { "es gibt kein spiel" }
+        onAllRefreshables { refreshAfterStartTurn() }
     }
 }

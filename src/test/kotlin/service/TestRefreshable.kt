@@ -14,8 +14,8 @@ class TestRefreshable : Refreshable {
     /** true when [refreshAfterGameEnd] is called */
     var refreshAfterGameEndCalled: Boolean = false
         private set
-    /** true when [refreshAfterTurnStart] is called */
-    var refreshAfterTurnStartCalled: Boolean = false
+    /** true when [refreshAfterStartTurn] is called */
+    var refreshAfterStartTurnCalled: Boolean = false
         private set
     /** true when [refreshAfterTurnEnd] is called */
     var refreshAfterTurnEndCalled: Boolean = false
@@ -23,8 +23,11 @@ class TestRefreshable : Refreshable {
     /** true when [refreshAfterSwitch] is called */
     var refreshAfterSwitchCalled: Boolean = false
         private set
-    /** true when [refreshAfterPush] is called */
-    var refreshAfterPushCalled: Boolean = false
+    /** true when [refreshAfterPushRight] is called */
+    var refreshAfterPushRightCalled: Boolean = false
+        private set
+    /** true when [refreshAfterPushLeft] is called */
+    var refreshAfterPushLeftCalled: Boolean = false
         private set
     /** true when [refreshAfterError] is called*/
     var refreshAfterErrorCalled: Boolean = false
@@ -34,15 +37,15 @@ class TestRefreshable : Refreshable {
         private set
     /**
      * make all variables false again
-     * use this before new test begin
-     */
+     * use this before new test begiin*/
     fun reset() {
         refreshAfterStartNewGameCalled = false
         refreshAfterGameEndCalled = false
-        refreshAfterTurnStartCalled = false
+        refreshAfterStartTurnCalled = false
         refreshAfterTurnEndCalled = false
         refreshAfterSwitchCalled = false
-        refreshAfterPushCalled = false
+        refreshAfterPushRightCalled = false
+        refreshAfterPushLeftCalled = false
         refreshAfterErrorCalled = false
         refreshLogCalled = false
     }
@@ -52,8 +55,8 @@ class TestRefreshable : Refreshable {
     override fun refreshAfterGameEnd(ranking: List<Player>) {
         refreshAfterGameEndCalled = true
     }
-    override fun refreshAfterTurnStart() {
-        refreshAfterTurnStartCalled = true
+    override fun refreshAfterStartTurn() {
+        refreshAfterStartTurnCalled = true
     }
     override fun refreshAfterTurnEnd() {
         refreshAfterTurnEndCalled = true
@@ -61,8 +64,11 @@ class TestRefreshable : Refreshable {
     override fun refreshAfterSwitch() {
         refreshAfterSwitchCalled = true
     }
-    override fun refreshAfterPush(newCard: Card, direction: Int) {
-        refreshAfterPushCalled = true
+    override fun refreshAfterPushRight(newCard: Card) {
+        refreshAfterPushRightCalled = true
+    }
+    override fun refreshAfterPushLeft(newCard: Card) {
+        refreshAfterPushLeftCalled = true
     }
     override fun refreshAfterError(message: String) {
         refreshAfterErrorCalled = true

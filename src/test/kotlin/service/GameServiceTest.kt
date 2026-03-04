@@ -21,8 +21,8 @@ class GameServiceTest {
     fun setUp() {
         rootService = RootService()
         testRefreshable = TestRefreshable()
-        rootService.gameService.addRefreshable(testRefreshable)
-        rootService.playerActionService.addRefreshable(testRefreshable)
+        rootService.addRefreshable(testRefreshable)
+        rootService.addRefreshable(testRefreshable)
         rootService.gameService.startNewGame(
             mutableListOf("zidane", "kross", "neuer"),
             3
@@ -113,6 +113,294 @@ class GameServiceTest {
         }
     }
     /**
+     * test if we get error when round count is 1 (minimum 2)*/
+    @Test
+    fun testStartNewGameTooFewRounds() {
+        rootService.currentGame = null
+        assertThrows<IllegalArgumentException> {
+            rootService.gameService.startNewGame(mutableListOf("zidane", "kross"), 1)
+        }
+    }
+    /**
+     * test if we get error when round count is 8 (maximum 7)
+     */
+    @Test
+    fun testStartNewGameTooManyRounds() {
+        rootService.currentGame = null
+        assertThrows<IllegalArgumentException> {
+            rootService.gameService.startNewGame(mutableListOf("zidane", "kross"), 8)
+        }
+    }
+    /**
+     * test if game works with minimum rounds (2)*/
+    @Test
+    fun testStartNewGameMinRounds() {
+        rootService.currentGame = null
+        assertDoesNotThrow {
+            rootService.gameService.startNewGame(mutableListOf("zidane", "kross"), 2)
+        }
+        val game = rootService.currentGame
+        checkNotNull(game)
+        assertEquals(2, game.totalRounds)
+    }
+    /**
+     * test if game works with maximum rounds (7)
+     */
+    @Test
+    fun testStartNewGameMaxRounds() {
+        rootService.currentGame = null
+        assertDoesNotThrow {
+            rootService.gameService.startNewGame(mutableListOf("zidane", "kross"), 7)
+        }
+        val game = rootService.currentGame
+        checkNotNull(game)
+        assertEquals(7, game.totalRounds)
+    }
+    /**
+     * test if evaluateCards find pair
+     */
+    @Test
+    fun testEvaluateCardsPair() {
+        val game = rootService.currentGame
+        checkNotNull(game)
+        val player = game.players[0]
+        player.hiddenCards.clear()
+        player.openCards.clear()
+        player.hiddenCards.add(Card(CardSuit.HEARTS, CardValue.ACE))
+        player.hiddenCards.add(Card(CardSuit.SPADES, CardValue.ACE))
+        player.openCards.add(Card(CardSuit.CLUBS, CardValue.FIVE))
+        player.openCards.add(Card(CardSuit.DIAMONDS, CardValue.EIGHT))
+        player.openCards.add(Card(CardSuit.HEARTS, CardValue.THREE))
+        rootService.gameService.evaluateCards(player)
+        assertEquals(entity.ScoreTable.PAIR, player.score)
+    }
+    /**
+     * test if evaluateCards find two pair
+     */
+    @Test
+    fun testEvaluateCardsTwoPair() {
+        val game = rootService.currentGame
+        checkNotNull(game)
+        val player = game.players[0]
+        player.hiddenCards.clear()
+        player.openCards.clear()
+        player.hiddenCards.add(Card(CardSuit.HEARTS, CardValue.ACE))
+        player.hiddenCards.add(Card(CardSuit.SPADES, CardValue.ACE))
+        player.openCards.add(Card(CardSuit.CLUBS, CardValue.KING))
+        player.openCards.add(Card(CardSuit.DIAMONDS, CardValue.KING))
+        player.openCards.add(Card(CardSuit.HEARTS, CardValue.THREE))
+        rootService.gameService.evaluateCards(player)
+        assertEquals(entity.ScoreTable.TWOPAIR, player.score)
+    }
+    /**
+     * test if evaluateCards find set
+     */
+    @Test
+    fun testEvaluateCardsSet() {
+        val game = rootService.currentGame
+        checkNotNull(game)
+        val player = game.players[0]
+        player.hiddenCards.clear()
+        player.openCards.clear()
+        player.hiddenCards.add(Card(CardSuit.HEARTS, CardValue.KING))
+        player.hiddenCards.add(Card(CardSuit.SPADES, CardValue.KING))
+        player.openCards.add(Card(CardSuit.CLUBS, CardValue.KING))
+        player.openCards.add(Card(CardSuit.DIAMONDS, CardValue.FIVE))
+        player.openCards.add(Card(CardSuit.HEARTS, CardValue.THREE))
+        rootService.gameService.evaluateCards(player)
+        assertEquals(entity.ScoreTable.SET, player.score)
+    }
+    /**
+     * test if evaluateCards find straight
+     */
+    @Test
+    fun testEvaluateCardsStraight() {
+        val game = rootService.currentGame
+        checkNotNull(game)
+        val player = game.players[0]
+        player.hiddenCards.clear()
+        player.openCards.clear()
+        player.hiddenCards.add(Card(CardSuit.HEARTS, CardValue.FIVE))
+        player.hiddenCards.add(Card(CardSuit.SPADES, CardValue.SIX))
+        player.openCards.add(Card(CardSuit.CLUBS, CardValue.SEVEN))
+        player.openCards.add(Card(CardSuit.DIAMONDS, CardValue.EIGHT))
+        player.openCards.add(Card(CardSuit.HEARTS, CardValue.NINE))
+        rootService.gameService.evaluateCards(player)
+        assertEquals(entity.ScoreTable.STRAIGHT, player.score)
+    }
+    /**
+     * test if evaluateCards find flush */
+    @Test
+    fun testEvaluateCardsFlush() {
+        val game = rootService.currentGame
+        checkNotNull(game)
+        val player = game.players[0]
+        player.hiddenCards.clear()
+        player.openCards.clear()
+        player.hiddenCards.add(Card(CardSuit.HEARTS, CardValue.TWO))
+        player.hiddenCards.add(Card(CardSuit.HEARTS, CardValue.FIVE))
+        player.openCards.add(Card(CardSuit.HEARTS, CardValue.EIGHT))
+        player.openCards.add(Card(CardSuit.HEARTS, CardValue.JACK))
+        player.openCards.add(Card(CardSuit.HEARTS, CardValue.ACE))
+        rootService.gameService.evaluateCards(player)
+        assertEquals(entity.ScoreTable.FLUSH, player.score)
+    }
+    /**
+     * test if evaluateCards find full house
+     */
+    @Test
+    fun testEvaluateCardsFullHouse() {
+        val game = rootService.currentGame
+        checkNotNull(game)
+        val player = game.players[0]
+        player.hiddenCards.clear()
+        player.openCards.clear()
+        player.hiddenCards.add(Card(CardSuit.HEARTS, CardValue.KING))
+        player.hiddenCards.add(Card(CardSuit.SPADES, CardValue.KING))
+        player.openCards.add(Card(CardSuit.CLUBS, CardValue.KING))
+        player.openCards.add(Card(CardSuit.DIAMONDS, CardValue.FIVE))
+        player.openCards.add(Card(CardSuit.HEARTS, CardValue.FIVE))
+        rootService.gameService.evaluateCards(player)
+        assertEquals(entity.ScoreTable.FULLHOUSE, player.score)
+    }
+    /**
+     * test if evaluateCards find four of kind
+     */
+    @Test
+    fun testEvaluateCardsFourOfAKind() {
+        val game = rootService.currentGame
+        checkNotNull(game)
+        val player = game.players[0]
+        player.hiddenCards.clear()
+        player.openCards.clear()
+        player.hiddenCards.add(Card(CardSuit.HEARTS, CardValue.QUEEN))
+        player.hiddenCards.add(Card(CardSuit.SPADES, CardValue.QUEEN))
+        player.openCards.add(Card(CardSuit.CLUBS, CardValue.QUEEN))
+        player.openCards.add(Card(CardSuit.DIAMONDS, CardValue.QUEEN))
+        player.openCards.add(Card(CardSuit.HEARTS, CardValue.THREE))
+        rootService.gameService.evaluateCards(player)
+        assertEquals(entity.ScoreTable.FOUROFAKIND, player.score)
+    }
+    /**
+     * test if evaluateCards find straight flush*/
+    @Test
+    fun testEvaluateCardsStraightFlush() {
+        val game = rootService.currentGame
+        checkNotNull(game)
+        val player = game.players[0]
+        player.hiddenCards.clear()
+        player.openCards.clear()
+        player.hiddenCards.add(Card(CardSuit.CLUBS, CardValue.FIVE))
+        player.hiddenCards.add(Card(CardSuit.CLUBS, CardValue.SIX))
+        player.openCards.add(Card(CardSuit.CLUBS, CardValue.SEVEN))
+        player.openCards.add(Card(CardSuit.CLUBS, CardValue.EIGHT))
+        player.openCards.add(Card(CardSuit.CLUBS, CardValue.NINE))
+        rootService.gameService.evaluateCards(player)
+        assertEquals(entity.ScoreTable.STRAIGHTFLUSH, player.score)
+    }
+    /**
+     * test if evaluateCards find royal flush
+     */
+    @Test
+    fun testEvaluateCardsRoyalFlush() {
+        val game = rootService.currentGame
+        checkNotNull(game)
+        val player = game.players[0]
+        player.hiddenCards.clear()
+        player.openCards.clear()
+        player.hiddenCards.add(Card(CardSuit.SPADES, CardValue.TEN))
+        player.hiddenCards.add(Card(CardSuit.SPADES, CardValue.JACK))
+        player.openCards.add(Card(CardSuit.SPADES, CardValue.QUEEN))
+        player.openCards.add(Card(CardSuit.SPADES, CardValue.KING))
+        player.openCards.add(Card(CardSuit.SPADES, CardValue.ACE))
+        rootService.gameService.evaluateCards(player)
+        assertEquals(entity.ScoreTable.ROYALFLUSH, player.score)
+    }
+    /**
+     * test if evaluateCards find high card
+     */
+    @Test
+    fun testEvaluateCardsHighCard() {
+        val game = rootService.currentGame
+        checkNotNull(game)
+        val player = game.players[0]
+        player.hiddenCards.clear()
+        player.openCards.clear()
+        player.hiddenCards.add(Card(CardSuit.HEARTS, CardValue.TWO))
+        player.hiddenCards.add(Card(CardSuit.SPADES, CardValue.FIVE))
+        player.openCards.add(Card(CardSuit.CLUBS, CardValue.EIGHT))
+        player.openCards.add(Card(CardSuit.DIAMONDS, CardValue.JACK))
+        player.openCards.add(Card(CardSuit.HEARTS, CardValue.ACE))
+        rootService.gameService.evaluateCards(player)
+        assertEquals(entity.ScoreTable.HIGHCARD, player.score)
+    }
+    /**
+     * test if evaluateCards find ace low straight*/
+    @Test
+    fun testEvaluateCardsAceLowStraight() {
+        val game = rootService.currentGame
+        checkNotNull(game)
+        val player = game.players[0]
+        player.hiddenCards.clear()
+        player.openCards.clear()
+        player.hiddenCards.add(Card(CardSuit.HEARTS, CardValue.ACE))
+        player.hiddenCards.add(Card(CardSuit.SPADES, CardValue.TWO))
+        player.openCards.add(Card(CardSuit.CLUBS, CardValue.THREE))
+        player.openCards.add(Card(CardSuit.DIAMONDS, CardValue.FOUR))
+        player.openCards.add(Card(CardSuit.HEARTS, CardValue.FIVE))
+        rootService.gameService.evaluateCards(player)
+        assertEquals(entity.ScoreTable.STRAIGHT, player.score)
+    }
+    /**
+     * test if evaluateCards throw error when game is null
+     */
+    @Test
+    fun testEvaluateCardsNoGame() {
+        val game = rootService.currentGame
+        checkNotNull(game)
+        val player = game.players[0]
+        rootService.currentGame = null
+        assertThrows<IllegalStateException> {
+            rootService.gameService.evaluateCards(player)
+        }
+    }
+    /**
+     * test if evaluateCards throw error when player does not have 5 cards*/
+    @Test
+    fun testEvaluateCardsWrongCardCount() {
+        val game = rootService.currentGame
+        checkNotNull(game)
+        val player = game.players[0]
+        player.hiddenCards.clear()
+        player.openCards.clear()
+        player.hiddenCards.add(Card(CardSuit.HEARTS, CardValue.ACE))
+        assertThrows<IllegalArgumentException> {
+            rootService.gameService.evaluateCards(player)
+        }
+    }
+    /**
+     * test if endTurn end the game when last round is finished*/
+    @Test
+    fun testEndTurnEndsGameAtLastRound() {
+        val game = rootService.currentGame
+        checkNotNull(game)
+        game.currentRound = game.totalRounds
+        game.currentPlayerIndex = game.players.size - 1
+        game.players.forEach { player ->
+            player.hiddenCards.clear()
+            player.openCards.clear()
+            player.hiddenCards.add(Card(CardSuit.HEARTS, CardValue.ACE))
+            player.hiddenCards.add(Card(CardSuit.HEARTS, CardValue.KING))
+            player.openCards.add(Card(CardSuit.HEARTS, CardValue.QUEEN))
+            player.openCards.add(Card(CardSuit.HEARTS, CardValue.JACK))
+            player.openCards.add(Card(CardSuit.HEARTS, CardValue.TEN))
+        }
+        testRefreshable.reset()
+        rootService.gameService.endTurn()
+        assertTrue(testRefreshable.refreshAfterGameEndCalled)
+        assertNull(rootService.currentGame)
+    }
+    /**
      * test if turn go to the next player and action are set to 2
      */
     @Test
@@ -200,7 +488,7 @@ class GameServiceTest {
         assertTrue(game.discardStack.isEmpty())
     }
     /**
-     * test if we get error when we try to refill but both stack are empty.
+     * test if we get error when we try to refill but both stack are empty
      */
     @Test
     fun testRefillDrawStackBothEmpty() {
@@ -208,11 +496,9 @@ class GameServiceTest {
         checkNotNull(game)
         game.drawStack.popAll()
         game.discardStack.popAll()
-        assertThrows<IllegalStateException> {
-            rootService.gameService.refillDrawStack()
-        }
+        rootService.gameService.refillDrawStack()
+        assertTrue(testRefreshable.refreshAfterErrorCalled)
     }
-
     /**
      * test if refill throw error if game is null
      */
@@ -244,6 +530,27 @@ class GameServiceTest {
         rootService.currentGame = null
         assertThrows<IllegalStateException> {
             rootService.gameService.updateLog("test")
+        }
+    }
+    /**
+     * test if startTurn call the refresh method
+     */
+    @Test
+    fun testStartTurn() {
+        val game = rootService.currentGame
+        checkNotNull(game)
+        testRefreshable.reset()
+        assertDoesNotThrow { rootService.gameService.startTurn() }
+        assertTrue(testRefreshable.refreshAfterStartTurnCalled)
+    }
+    /**
+     * test if startTurn throw error if game is null
+     */
+    @Test
+    fun testStartTurnNoGame() {
+        rootService.currentGame = null
+        assertThrows<IllegalStateException> {
+            rootService.gameService.startTurn()
         }
     }
 }

@@ -10,10 +10,10 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * @throws IllegalStateException if there is no game or no actions left
      */
     private fun reduceAction() {
-        checkNotNull(rootService.currentGame) { "es gibt kein spiel am laufen" }
-        val game = rootService.currentGame!!
+        val game = rootService.currentGame
+        checkNotNull(game) { "aktuell läuft kein spiel" }
         val player = game.players[game.currentPlayerIndex]
-        check(player.actionsLeft > 0) { "Spieler hat keine Aktion mehr" }
+        check(player.actionsLeft > 0) { "das kann doch nicht sein!" }
         player.actionsLeft--
         if (player.actionsLeft == 0) {
             rootService.gameService.endTurn()
@@ -26,8 +26,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * @throws IllegalStateException if there is no game or no actions left
      */
     fun pushRight() {
-        checkNotNull(rootService.currentGame) { "es gibt kein spiel am laufen" }
-        val game = rootService.currentGame!!
+        val game = rootService.currentGame
+        checkNotNull(game) { "es gibt kein spiel" }
         val player = game.players[game.currentPlayerIndex]
         check(player.actionsLeft > 0) { "spieler kann nicht spielen" }
         val rightCard = game.centerCards.removeAt(2)
@@ -38,7 +38,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         val newLeftCard = game.drawStack.pop()
         game.centerCards.add(0, newLeftCard)
         rootService.gameService.updateLog("Spieler ${player.name} hat nach rechts geschoben")
-        onAllRefreshables { refreshAfterPush(newLeftCard, 1) }
+        onAllRefreshables { refreshAfterPushRight(newLeftCard) }
         reduceAction()
     }
     /**
@@ -48,8 +48,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * @throws IllegalStateException if there is no game or no actions left
      */
     fun pushLeft() {
-        checkNotNull(rootService.currentGame) { "es gibt kein spiel am laufen" }
-        val game = rootService.currentGame!!
+        val game = rootService.currentGame
+        checkNotNull(game) { "aktuell läuft kein spiel" }
         val player = game.players[game.currentPlayerIndex]
         check(player.actionsLeft > 0) { "Spieler kann nicht spielen" }
         val leftCard = game.centerCards.removeAt(0)
@@ -60,7 +60,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         val newRightCard = game.drawStack.pop()
         game.centerCards.add(newRightCard)
         rootService.gameService.updateLog("Spieler ${player.name} hat nach links geschoben")
-        onAllRefreshables { refreshAfterPush(newRightCard, 0) }
+        onAllRefreshables { refreshAfterPushLeft(newRightCard) }
         reduceAction()
     }
     /**
@@ -71,8 +71,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * @throws IllegalArgumentException if index is not between 0 and 2
      */
     fun switchOne(openCardIndex: Int, centerCardIndex: Int) {
-        checkNotNull(rootService.currentGame) { "es gibt kein spiel am laufen" }
-        val game = rootService.currentGame!!
+        val game = rootService.currentGame
+        checkNotNull(game) { "es gibt kein spiel" }
         val player = game.players[game.currentPlayerIndex]
         check(player.actionsLeft > 0) { "Spieler kann nicht spielen" }
         require(openCardIndex in 0..2) { "openCardIndex wert ist ungültig" }
@@ -82,8 +82,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         game.centerCards[centerCardIndex] = openCard
         player.openCards[openCardIndex] = centerCard
         rootService.gameService.updateLog(
-            "Spieler ${player.name} hat eine karte $openCard in seiner hand mit einer karte $centerCard getauscht"
-        )
+            "Spieler ${player.name} hat seine karte $openCard mit der karte $centerCard getauscht")
         onAllRefreshables { refreshAfterSwitch() }
         reduceAction()
     }
@@ -92,8 +91,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * @throws IllegalStateException if there is no game or no actions left
      */
     fun switchAll() {
-        checkNotNull(rootService.currentGame) { "es gibt kein spiel am laufen" }
-        val game = rootService.currentGame!!
+        val game = rootService.currentGame
+        checkNotNull(game) { "aktuell läuft kein spiel" }
         val player = game.players[game.currentPlayerIndex]
         check(player.actionsLeft > 0) { "Spieler kann nicht spielen" }
         for (i in 0..2) {
@@ -102,7 +101,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             game.centerCards[i] = cardInHand
             player.openCards[i] = cardOnTable
         }
-        rootService.gameService.updateLog("Spieler ${player.name} hat alle Karten in seiner Hand mit allen Karten auf dem Tisch getauscht")
+        rootService.gameService.updateLog("Spieler ${player.name} hat alle Karten in seiner Hand getauscht")
         onAllRefreshables { refreshAfterSwitch() }
         reduceAction()
     }
