@@ -241,7 +241,7 @@ class GameScene(private val rootService: RootService):
             centerLayout.add(cv)
         }
     }
-    /** show other players cards face down around table */
+    /** show other players open cards face up and hidden cards face down */
     private fun showOthers(game: Game) {
         for (label in otherPlayersLabels) removeComponents(label)
         for (layout in otherPlayersLayouts) removeComponents(layout)
@@ -271,9 +271,16 @@ class GameScene(private val rootService: RootService):
                 alignment = Alignment.CENTER).apply { rotation = rot }
             val layout = LinearLayout<CardView>(posX = lx, posY = ly, width = lw, height = 150, spacing = -25,
                 alignment = Alignment.CENTER).apply { rotation = rot }
-            repeat(5) {
-                layout.add(CardView(posX = 0, posY = 0, width = 90, height = 135,
-                    front = cardImageLoader.backImage, back = cardImageLoader.backImage))
+            for (card in player.openCards) {
+                val cv = CardView(posX = 0, posY = 0, width = 90, height = 135,
+                    front = cardImageLoader.frontImageFor(card.suit, card.value),
+                    back = cardImageLoader.backImage)
+                cv.showFront()
+                layout.add(cv)
+            }
+            repeat(2) {
+                layout.add(CardView(posX = 0, posY = 0, width = 90,
+                    height = 135, front = cardImageLoader.backImage, back = cardImageLoader.backImage))
             }
             otherPlayersLabels.add(nameLabel)
             otherPlayersLayouts.add(layout)
@@ -321,8 +328,8 @@ class GameScene(private val rootService: RootService):
         }
     }
     /** refresh everything for current player */
-    private fun showCurrentPlayer() {   val game = rootService.currentGame
-        checkNotNull(game) { "AKTUELL LÄUFT KEIN SPIEL" }
+    private fun showCurrentPlayer() {
+        val game = rootService.currentGame ?: return
         resetPicks()
         showHand(game)
         showCenter(game)
@@ -331,8 +338,8 @@ class GameScene(private val rootService: RootService):
         updateInfo(game)
     }
     /** called when game start, show first player cards */
-    override fun refreshAfterStartNewGame() {val game = rootService.currentGame
-        checkNotNull(game) { "aktuell läuft kein spiel" }
+    override fun refreshAfterStartNewGame() {
+        val game = rootService.currentGame ?: return
         logMessages.clear()
         logOffset = 0
         resetPicks()
@@ -345,14 +352,13 @@ class GameScene(private val rootService: RootService):
     }
     /** called when turn end, just update info */
     override fun refreshAfterTurnEnd() {
-        val game = rootService.currentGame
-        checkNotNull(game) { "es gibt kein spiel" }
+        val game = rootService.currentGame ?: return
         resetPicks()
         updateInfo(game)
     }
     /** called after card swap, refresh cards*/
-    override fun refreshAfterSwitch() { val game = rootService.currentGame
-        checkNotNull(game) { "es gibt kein spiel" }
+    override fun refreshAfterSwitch() {
+        val game = rootService.currentGame ?: return
         lock()
         resetPicks()
         showHand(game)
@@ -362,8 +368,8 @@ class GameScene(private val rootService: RootService):
         playAnimation(DelayAnimation(500).apply { onFinished = { unlock() } })
     }
     /** called after push left, refresh center cards*/
-    override fun refreshAfterPushLeft(newCard: Card) { val game = rootService.currentGame
-        checkNotNull(game) { "es gibt kein spiel" }
+    override fun refreshAfterPushLeft(newCard: Card) {
+        val game = rootService.currentGame ?: return
         lock()
         resetPicks()
         showCenter(game)
@@ -374,8 +380,7 @@ class GameScene(private val rootService: RootService):
     }
     /** called after push right, refresh center cards */
     override fun refreshAfterPushRight(newCard: Card) {
-        val game = rootService.currentGame
-        checkNotNull(game) { "aktuell gibt es kein spiel" }
+        val game = rootService.currentGame ?: return
         lock()
         resetPicks()
         showCenter(game)
@@ -394,6 +399,7 @@ class GameScene(private val rootService: RootService):
         logMessages.add(message)
         updateLog()
     }
+    /** call function showCurrentPlayer() */
     override fun refreshAfterStartTurn() {
         showCurrentPlayer()
     }

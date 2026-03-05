@@ -13,7 +13,7 @@ import tools.aqua.bgw.visual.ColorVisual
 /**
  * show final ranking when game end
  */
-class GameFinishedScene() : MenuScene(1920, 1080), Refreshable {
+class GameFinishedScene : MenuScene(1920, 1080), Refreshable {
     /** dark box in middle */
     private val contentPane = Pane<UIComponent>(posX = 1920/2-350, posY = 1080/2-370, width = 700,
         height = 740, visual = ColorVisual(15, 45, 20))

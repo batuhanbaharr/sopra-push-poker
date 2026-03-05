@@ -68,7 +68,7 @@ class GameMenuScene(private val rootService: RootService) : MenuScene(1920, 1080
     private val roundLabel = Label(posX = 50, posY = 500, width = 150, height = 50, text = "Runden:",
         font = Font(size = 18, color = Color(212, 175, 55)), alignment = Alignment.CENTER_LEFT)
     /** dropdown to pick round count*/
-    private val roundBox = ComboBox<Int>(posX = 210, posY = 500, width = 440,
+    private val roundBox = ComboBox(posX = 210, posY = 500, width = 440,
         height = 50, items = listOf(2, 3, 4, 5, 6, 7), prompt = "Runden auswählen",
         font = Font(size = 16)).apply { visual = ColorVisual(30, 70, 40) }
     /** show error text here */

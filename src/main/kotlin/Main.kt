@@ -1,11 +1,11 @@
-import gui.SopraApplication
+import gui.GameApplication
 
 /**
- * Main entry point that starts the [SopraApplication]
+ * Main entry point that starts the [GameApplication]
  *
  * Once the application is closed, it prints a message indicating the end of the application.
  */
 fun main() {
-    SopraApplication().show()
+    GameApplication().show()
     println("Application ended. Goodbye")
 }

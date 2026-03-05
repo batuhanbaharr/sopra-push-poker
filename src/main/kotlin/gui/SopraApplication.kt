@@ -6,7 +6,7 @@ import tools.aqua.bgw.animation.DelayAnimation
 import tools.aqua.bgw.core.BoardGameApplication
 /**
  * main app that manage all scenes*/
-class SopraApplication : BoardGameApplication("SoPra Game"), Refreshable {
+class GameApplication : BoardGameApplication("SoPra Game"), Refreshable {
     /** root service for game logic */
     private val rootService = RootService()
     /** menu scene to enter names and rounds */

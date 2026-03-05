@@ -38,8 +38,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         val newLeftCard = game.drawStack.pop()
         game.centerCards.add(0, newLeftCard)
         rootService.gameService.updateLog("Spieler ${player.name} hat nach rechts geschoben")
-        onAllRefreshables { refreshAfterPushRight(newLeftCard) }
         reduceAction()
+        onAllRefreshables { refreshAfterPushRight(newLeftCard) }
     }
     /**
      * push the center cards to left
@@ -60,8 +60,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         val newRightCard = game.drawStack.pop()
         game.centerCards.add(newRightCard)
         rootService.gameService.updateLog("Spieler ${player.name} hat nach links geschoben")
-        onAllRefreshables { refreshAfterPushLeft(newRightCard) }
         reduceAction()
+        onAllRefreshables { refreshAfterPushLeft(newRightCard) }
     }
     /**
      * swap one open card of player with one card from center
@@ -83,8 +83,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         player.openCards[openCardIndex] = centerCard
         rootService.gameService.updateLog(
             "Spieler ${player.name} hat seine karte $openCard mit der karte $centerCard getauscht")
-        onAllRefreshables { refreshAfterSwitch() }
         reduceAction()
+        onAllRefreshables { refreshAfterSwitch() }
     }
     /**
      * swap all 3 open cards of player with 3 center cards
@@ -102,7 +102,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             player.openCards[i] = cardOnTable
         }
         rootService.gameService.updateLog("Spieler ${player.name} hat alle Karten in seiner Hand getauscht")
-        onAllRefreshables { refreshAfterSwitch() }
         reduceAction()
+        onAllRefreshables { refreshAfterSwitch() }
     }
 }
