@@ -75,8 +75,8 @@ class GameScene(private val rootService: RootService):
     private val drawLabel = Label(posX = 350, posY = 290, width = 190, height = 40, text = "Nachziehstapel",
         font = Font(size = 18, color = Color(212, 175, 55)),
         alignment = Alignment.CENTER)
-    private val drawCard = CardView(posX = 380, posY = 340, width = 130, height = 200, front = cardImageLoader.backImage,
-        back = cardImageLoader.backImage)
+    private val drawCard = CardView(posX = 380, posY = 340, width = 130,
+        height = 200, front = cardImageLoader.backImage, back = cardImageLoader.backImage)
     private val drawCount = Label(posX = 350, posY = 545, width = 190, height = 30, text = "Karten: 0",
         font = Font(size = 16, color = Color(160, 160, 140)), alignment = Alignment.CENTER)
     private val discardLabel = Label(posX = 1920 - 540, posY = 290, width = 190, height = 40, text = "Ablagestapel",

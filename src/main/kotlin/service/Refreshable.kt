@@ -42,5 +42,6 @@ interface Refreshable {
      * @param message message that was added
      */
     fun refreshLog(message: String){}
+    /** called when player start turn */
     fun refreshAfterStartTurn(){}
 }

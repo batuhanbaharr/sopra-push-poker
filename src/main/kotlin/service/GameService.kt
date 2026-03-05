@@ -173,6 +173,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         updateLog("Spieler ${game.players[game.currentPlayerIndex].name} kann jetzt spielen")
         onAllRefreshables { refreshAfterTurnEnd() }
     }
+    /** start turn for current player */
     fun startTurn(){
         val game = rootService.currentGame
         checkNotNull(game) { "es gibt kein spiel" }
