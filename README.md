@@ -2,7 +2,7 @@
 
 A desktop card game written in **Kotlin** with the **BoardGameWork (BGW)** framework.
 It was built as the individual project (*Einzelprojekt*) of the **Software Praktikum (SoPra) 1** course at
-**TU Dortmund**, summer term 2025 .
+**TU Dortmund**.
 
 > **Course assignment.** This repository is my solution to the SoPra 1 assignment. The task was to design,
 > implement and test a complete game following the course architecture (entity / service / GUI layers),
